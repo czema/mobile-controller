@@ -371,31 +371,24 @@ int IRrecv::decode(decode_results *results) {
   if (decodeNEC(results)) {
     return DECODED;
   }
-
   if (decodeSony(results)) {
     return DECODED;
   }
-
   if (decodeSanyo(results)) {
     return DECODED;
   }
-
   if (decodeMitsubishi(results)) {
     return DECODED;
   }
-
   if (decodeRC5(results)) {
     return DECODED;
   }
-
   if (decodeRC6(results)) {
     return DECODED;
   }
-
-  if (decodePanasonic(results)) {
+    if (decodePanasonic(results)) {
         return DECODED;
     }
-
     if (decodeJVC(results)) {
         return DECODED;
     }
@@ -663,7 +656,6 @@ int IRrecv::getRClevel(decode_results *results, int *offset, int *used, int t1) 
     *used = 0;
     (*offset)++;
   }
-
   return val;
 }
 
