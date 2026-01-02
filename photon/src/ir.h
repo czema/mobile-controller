@@ -1,8 +1,11 @@
 #ifndef IR_H
 #define IR_H
 
-const int RECV_PIN = D2;
-const int MAX_IRDATA = 64;
+#include "Particle.h"
+
+constexpr int IR_RECV_PIN = D6;
+constexpr int IR_MAX_DATA = 64;
+constexpr int IR_EEPROM_ADDR = 0;
 
 typedef struct {
   uint8_t type;

@@ -7,7 +7,7 @@
 // Include Particle Device OS APIs
 #include "Particle.h"
 #include "ir.h"
-#include "rem.h"
+#include "rf.h"
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
@@ -30,12 +30,18 @@ int func_motor_end(String data) {
 // setup() runs once, when the device is first turned on
 void setup() {
   ir_setup();
+  rf_setup();
 
   Particle.function("ir_dump", func_ir_dump);
   Particle.function("ir_erase", func_ir_erase);
   Particle.function("ir_recv", func_ir_recv);
   Particle.function("ir_send", func_ir_send);
-  Particle.function("rem_send", func_rem_send);
+
+  Particle.function("rf_dump", func_rf_dump);
+  Particle.function("rf_erase", func_rf_erase);
+  Particle.function("rf_recv", func_rf_recv);
+  Particle.function("rf_send", func_rf_send);
+  
   Particle.function("motor_start", func_motor_start);
   Particle.function("motor_end", func_motor_end);
 }
@@ -43,4 +49,5 @@ void setup() {
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
   ir_loop();
+  rf_loop();
 }
