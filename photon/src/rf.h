@@ -10,7 +10,7 @@ constexpr int RF_EEPROM_ADDR = 1024; // IR data is held from 0-512, leave a gap 
 
 typedef struct {
   uint8_t protocol;
-  uint8_t length;
+  uint8_t bits;
   uint32_t value;
 } RFdata;
 

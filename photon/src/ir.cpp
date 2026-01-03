@@ -1,5 +1,5 @@
-#include <IRremote.h>
 #include "ir.h"
+#include <IRremote.h>
 
 IRsend irsend;  // Hard coded to send on pin A5.
 IRrecv irrecv(IR_RECV_PIN);
@@ -12,7 +12,7 @@ void store_ir_data(int slot, uint8_t type, uint8_t bits, uint32_t value) {
   IRdata ir = {type, bits, value};
 
   int addr = IR_EEPROM_ADDR + (sizeof(IRdata) * slot);
-  EEPROM.put(addr, ir); // Store
+  EEPROM.put(addr, ir);  // Store
   Log.info("Stored IR data at %d (size %d * idx %d).", addr, sizeof(IRdata), slot);
 }
 
@@ -59,6 +59,8 @@ int func_ir_recv(String data) {
   }
 
   ir_recv_slot = slot;
+  RGB.control(true);
+  RGB.color(128, 0, 0);
 
   // Start watching for a signal.  This is non-blocking, calling `decode` will let you know if a signal was received.
   // Transmitting a signal will cause the system to stop waiting for an incoming signal.
@@ -87,6 +89,9 @@ int func_ir_send(String data) {
     return -2;
   }
 
+  RGB.control(true);
+  RGB.color(0, 255, 0);
+
   Log.info("func_ir_send - Sending type: %d, bits: %d, value: %lu", ir.type, ir.bits, ir.value);
 
   // Send immediately.
@@ -96,18 +101,22 @@ int func_ir_send(String data) {
       break;
     default: {
       Log.warn("Unrecognized IR type %d. Expecting 1.", ir.type);
+
+      RGB.control(false);
+
       return -3;
     }
   }
 
+  RGB.control(false);
+
   return 1;
 }
 
-void ir_setup() {
-}
+void ir_setup() {}
 
 void ir_loop() {
-   if (ir_recv_slot != -1) {
+  if (ir_recv_slot != -1) {
     // If a function activated the IR receiver, start checking if a signal is received.
     // Store it in the designated slot.
     if (irrecv.decode(&results)) {
@@ -118,6 +127,7 @@ void ir_loop() {
 
       ir_recv_slot = -1;  // Reset
       irrecv.blink13(false);
+      RGB.control(true);
     }
   }
 }
