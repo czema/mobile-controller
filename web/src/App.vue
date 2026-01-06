@@ -9,6 +9,7 @@
   const config_dialog = ref<HTMLDialogElement | null>(null)
   
   const DEVICE_ID = "33003d000947373034353237";
+  const PARTICLE_ACCESS_TOKEN = "";
   const TYPES = ["ir", "rf"];
   const INDEXES = [...Array(64).keys()];
 
@@ -19,7 +20,7 @@
         arg: arg
       }),
       headers: {
-        "Authorization": "Bearer 1101b3141ce87335a29da5fea671960bf9a4171c"
+        "Authorization": `Bearer ${PARTICLE_ACCESS_TOKEN}`
       }
     });
 
@@ -71,7 +72,7 @@
         arg: target.value.index
       }),
       headers: {
-        "Authorization": "Bearer 1101b3141ce87335a29da5fea671960bf9a4171c"
+        "Authorization": `Bearer ${PARTICLE_ACCESS_TOKEN}`
       }
     });
   }
