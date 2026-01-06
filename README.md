@@ -6,7 +6,7 @@ Control IR and RF remotes from mobile device.
 * Particle Photon (original Photon 1 because Photon 2 doesn't support the IRremote library)
 * VS1838B IR receiver - Wired to pin A5.
 * IR LED - Wired to pin D2.
-* RF remote control based on EV1527 - Wired to pins D3-D5 and A0-A2.
+* RF remote control based on EV1527 - Receiver wired D3. Sender wired D4.
 
 The Photon connects to the Particle Cloud and listens for certain function calls.  It translates these calls into interactions with IR and RF devices.
 
