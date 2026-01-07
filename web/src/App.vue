@@ -2,7 +2,7 @@
   import 'bootstrap/dist/css/bootstrap.min.css';
   import 'bootstrap/dist/js/bootstrap.bundle.min.js'; // Includes Popper.js
 
-  import { ref } from 'vue'
+  import { ref, toRaw } from 'vue'
 
   const config = JSON.parse(window.localStorage.getItem('config') ?? '[]')
 
@@ -12,6 +12,13 @@
   const PARTICLE_ACCESS_TOKEN = "";
   const TYPES = ["ir", "rf"];
   const INDEXES = [...Array(64).keys()];
+  const SLOT_TEMPLATE = {
+    is_new: true,
+    room: null,
+    label: '',
+    type: null,
+    index: null
+  }
 
   const clicked = async (func: string, arg: string) => {
     const resp = await fetch(`https://api.particle.io/v1/devices/${DEVICE_ID}/${func}`, {
@@ -31,14 +38,37 @@
   let timer = 0;
 
   const addItem = () => {
-    target.value = {
-      isnew: true,
-      label: '',
-      type: null,
-      index: null
-    }
+    const obj = structuredClone(SLOT_TEMPLATE)
+    target.value = obj
 
     configure();
+  }
+
+  const getHighestIndex = (type: string) => {
+    // Get the highest in-use index with the selected type.
+    let highest = -1;
+    config.filter((c: any) => c.type === type).forEach((c: any) => {
+      if (c.index > highest) {
+        highest = c.index;
+      }
+    })
+
+    return highest;
+  }
+
+  const deleteItem = (obj: any) => {
+    const idx = config.indexOf(toRaw(obj));
+    if (idx !== -1) {
+      config.splice(idx, 1);
+
+      // Commit to storage.
+      const config_str = JSON.stringify(config)
+      window.localStorage.setItem('config', config_str)
+
+      target.value = null;
+      window.clearTimeout(timer);
+      config_dialog.value!.close();
+    }
   }
 
   const pointerdown = (item: any) => {
@@ -81,9 +111,12 @@
     if (!target.value) return;
     delete target.value.handled;
 
-    if (target.value.isnew) {
-      delete target.value.isnew
-      config.push(target.value)
+    if (target.value.is_new) {
+      // Do not create the item if label isn't set.
+      if (target.value.label) {
+        delete target.value.is_new
+        config.push(toRaw(target.value))
+      }
     }
 
     // Commit to storage.
@@ -98,57 +131,48 @@
 </script>
 
 <template>
-  <dialog ref="config_dialog">
+  <dialog ref="config_dialog" style="margin:auto;box-shadow:rgba(0, 0, 0, 0.3) 4px 4px 10px;border-radius:15px;border:2px solid #1B80B9">
     {{target}}
     <table class="table" v-if="target">
-      <tr>
-        <td>
-          <label for="label">Label</label>
-        </td>
-        <td>
-          <input type="text" class="form-control" id="label" v-model="target.label" />
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="type">Type</label>
-        </td>
-        <td>
-          <select id="type" class="form-control" v-model="target.type">
-            <option v-for="type in TYPES" :value="type">
-              {{ type }}
-            </option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="index">Index</label>
-        </td>
-        <td>
-          <select id="index" class="form-control" v-model="target.index">
-            <option v-for="index in INDEXES" :value="index">
-              {{ index + 1 }}
-            </option>
-          </select>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <label for="icon">Icon</label>
-        </td>
-        <td>
-          
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <button class="btn btn-danger" @click="program()">Program</button>
-        </td>
-        <td>
-          <button class="btn btn-info" @click="closeConfigure()">Close</button>
-        </td>
-      </tr>
+      <tbody>
+        <tr>
+          <td>
+            <label for="label">Label</label>
+          </td>
+          <td>
+            <input type="text" class="form-control" id="label" v-model="target.label" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="type">Type</label>
+          </td>
+          <td>
+            <select id="type" class="form-control" v-model="target.type" @change="event => target.index = getHighestIndex((event!.target as any).value) + 1">
+              <option disabled :value="null">Select Type</option>
+              <option v-for="type in TYPES" :value="type">
+                {{ type }}
+              </option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="icon">Icon</label>
+          </td>
+          <td>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div style="display:flex;justify-content:space-between">
+              <button class="btn btn-warning" @click="program()">Program</button>
+              <button class="btn btn-info" @click="closeConfigure()">Close</button>
+              <button class="btn btn-danger" @click="deleteItem(target)">Delete</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </dialog>
 
