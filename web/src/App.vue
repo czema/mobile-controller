@@ -4,7 +4,7 @@
 
   import { ref, toRaw } from 'vue'
 
-  const config = JSON.parse(window.localStorage.getItem('config') ?? '[]')
+  const config = ref(JSON.parse(window.localStorage.getItem('config') ?? '[]'))
 
   const config_dialog = ref<HTMLDialogElement | null>(null)
   
@@ -47,7 +47,7 @@
   const getHighestIndex = (type: string) => {
     // Get the highest in-use index with the selected type.
     let highest = -1;
-    config.filter((c: any) => c.type === type).forEach((c: any) => {
+    config.value.filter((c: any) => c.type === type).forEach((c: any) => {
       if (c.index > highest) {
         highest = c.index;
       }
@@ -57,12 +57,12 @@
   }
 
   const deleteItem = (obj: any) => {
-    const idx = config.indexOf(toRaw(obj));
+    const idx = config.value.indexOf(obj);
     if (idx !== -1) {
-      config.splice(idx, 1);
+      config.value.splice(idx, 1);
 
       // Commit to storage.
-      const config_str = JSON.stringify(config)
+      const config_str = JSON.stringify(config.value)
       window.localStorage.setItem('config', config_str)
 
       target.value = null;
@@ -115,12 +115,12 @@
       // Do not create the item if label isn't set.
       if (target.value.label) {
         delete target.value.is_new
-        config.push(toRaw(target.value))
+        config.value.push(toRaw(target.value))
       }
     }
 
     // Commit to storage.
-    const config_str = JSON.stringify(config)
+    const config_str = JSON.stringify(config.value)
     window.localStorage.setItem('config', config_str)
 
     target.value = null;
