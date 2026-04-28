@@ -1,0 +1,18 @@
+{
+  "name": "Home Control",
+  "short_name": "Home Control",
+  "description": "IR/RF remote control for Particle Photon",
+  "start_url": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b0b13",
+  "theme_color": "#0b0b13",
+  "icons": [
+    {
+      "src": "/house.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
